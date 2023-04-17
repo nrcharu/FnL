@@ -1,0 +1,425 @@
+{
+	"info": {
+		"_postman_id": "023e65dc-adf4-4add-b947-5e832c568bfd",
+		"name": "RestfulAPI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26758985"
+	},
+	"item": [
+		{
+			"name": "List of all objects",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/objects?",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"objects"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null
+						}
+					]
+				},
+				"description": "This request fetches all the objects of the RESTFUL API.\n\nThe below tests are validated as given at Collection level\n\nThe result should give a response code of 200.\n\nAnd the response data schema should be as per the given schema"
+			},
+			"response": []
+		},
+		{
+			"name": "List of Objects By IDs",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);\r",
+							"\r",
+							"//Verify that the response has only 3 objects\r",
+							"pm.test(\"Check if only 3 Data are fetched from the request\",function(){\r",
+							"    pm.expect(jsonData.length).to.be.eql(3)\r",
+							"})\r",
+							"\r",
+							"//Verify the IDs of the objects are [1,5,10]\r",
+							"pm.test(\"Check if IDs [1,5,10] are available in the response\",function(){\r",
+							"    for(var i = 0; i < jsonData.length; i++){\r",
+							"        pm.expect(jsonData[i].id).to.be.oneOf([\"1\",\"5\",\"10\"]);\r",
+							"\r",
+							"    }\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/objects?id=1&id=5&id=10",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"objects"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "1"
+						},
+						{
+							"key": "id",
+							"value": "5"
+						},
+						{
+							"key": "id",
+							"value": "10"
+						}
+					]
+				},
+				"description": "This request fetches specific objects by IDs\n\nThe below tests are validated as given at Collection level\n\nThe result should give a response code of 200.\n\nAnd the response data schema should be as per the given schema\n\nThe below request level tests are validated\n\nThe response should contain only 3 objects.\n\nThe reponse should contain only IDs \\[1,5,10\\]\n\nEndFragment"
+			},
+			"response": []
+		},
+		{
+			"name": "Add Object",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"//Create new collection variables for request body creation and the same variables can be used in the subsequent requests\r",
+							"\r",
+							"var productname = pm.variables.replaceIn('{{$randomProductName}}')\r",
+							"var productPrice = pm.variables.replaceIn('{{$randomPrice}}')\r",
+							"\r",
+							"pm.collectionVariables.set(\"name\", productname);\r",
+							"pm.collectionVariables.set(\"year\", \"2023\");\r",
+							"pm.collectionVariables.set(\"price\", productPrice);\r",
+							"pm.collectionVariables.set(\"cpu_model\", \"Intel Core i1\");\r",
+							"pm.collectionVariables.set(\"harddisk\", \"3 TB\");\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);\r",
+							"\r",
+							"//Verify the property CreatedAt is available in the response body\r",
+							"\r",
+							"pm.test('Verify if createdAt property is available in responseBody', function() {\r",
+							"  pm.expect(jsonData).to.have.property('createdAt');\r",
+							"});\r",
+							"\r",
+							"//Verify the response body against the request body sent\r",
+							"\r",
+							"pm.test(\"Verify the newly created object\",function(){\r",
+							"    pm.expect(jsonData.name).to.be.eql(pm.collectionVariables.get('name'));\r",
+							"    pm.expect(jsonData.data['year']).to.be.eql(pm.collectionVariables.get('year'));\r",
+							"    pm.expect(jsonData.data['price']).to.be.eql(pm.collectionVariables.get('price'));\r",
+							"    pm.expect(jsonData.data['CPU model']).to.be.eql(pm.collectionVariables.get('cpu_model'));\r",
+							"    pm.expect(jsonData.data['Hard disk size']).to.be.eql(pm.collectionVariables.get('harddisk'));\r",
+							"})\r",
+							"\r",
+							"//Save the newly created id value to be sent to the next requests\r",
+							"pm.collectionVariables.set('id',jsonData.id);\r",
+							"\r",
+							"postman.setNextRequest('Update Object');"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n   \"name\": \"{{name}}\",\r\n   \"data\": {\r\n      \"year\": \"{{year}}\",\r\n      \"price\": \"{{price}}\",\r\n      \"CPU model\": \"{{cpu_model}}\",\r\n      \"Hard disk size\": \"{{harddisk}}\"\r\n   }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/objects",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"objects"
+					]
+				},
+				"description": "StartFragment\n\nThis request tests the creation of new object\n\nThe below tests are validated as given at Collection level\n\nThe result should give a response code of 200.\n\nAnd the response data schema should be as per the given schema\n\nThe below tests are validated at ther request level\n\n- createdAt property available in the responsebody\n- newly created object properties and its values against the request body\n    \n\nEndFragment"
+			},
+			"response": []
+		},
+		{
+			"name": "Update Object",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var productColor = pm.variables.replaceIn('{{$randomColor}}')\r",
+							"\r",
+							"pm.collectionVariables.set(\"color\", productColor);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);\r",
+							"\r",
+							"//Verify the property updatedAt is available in the response body\r",
+							"\r",
+							"pm.test('Verify if updatedAt property is available in responseBody', function() {\r",
+							"  pm.expect(jsonData).to.have.property('updatedAt');\r",
+							"});\r",
+							"\r",
+							"//Verify the response body against the request body sent\r",
+							"\r",
+							"pm.test(\"Verify the newly updated color property in object\",function(){    \r",
+							"    pm.expect(jsonData.data['color']).to.be.eql(pm.collectionVariables.get('color'));\r",
+							"})\r",
+							"\r",
+							"postman.setNextRequest('Partially update object');"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n   \"name\": \"{{name}}\",\r\n   \"data\": {\r\n      \"year\": \"{{year}}\",\r\n      \"price\": \"{{price}}\",\r\n      \"CPU model\": \"{{cpu_model}}\",\r\n      \"Hard disk size\": \"{{harddisk}}\",\r\n      \"color\": \"{{color}}\"\r\n   }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/objects/{{id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"objects",
+						"{{id}}"
+					]
+				},
+				"description": "This request tests the update of existing object based on {{id}} value\n\nThe below tests are validated as given at Collection level\n\nThe result should give a response code of 200.\n\nAnd the response data schema should be as per the given schema\n\nThe below tests are validated at ther request level\n\n- updatedAt property available in the responsebody\n- updated object properties and its values against the request body"
+			},
+			"response": []
+		},
+		{
+			"name": "Partially update object",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.collectionVariables.set(\"name\", pm.collectionVariables.get(\"name\")+\"_updated\");"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);\r",
+							"\r",
+							"//Verify the property updatedAt is available in the response body\r",
+							"pm.test('Verify if updatedAt property is available in responseBody', function() {\r",
+							"  pm.expect(jsonData).to.have.property('updatedAt');\r",
+							"});\r",
+							"\r",
+							"\r",
+							"//Verify the updated property value eg: name in our test\r",
+							"\r",
+							"pm.test(\"Verify the updated property name\",function(){\r",
+							"    pm.expect(jsonData.name).to.be.eql(pm.collectionVariables.get('name'));\r",
+							"})\r",
+							"\r",
+							"//Verify that the rest of the object is not changed\r",
+							"\r",
+							"pm.test(\"Verify the rest of the property values are not changed\",function(){\r",
+							"    pm.expect(jsonData.data['year']).to.be.eql(pm.collectionVariables.get('year'));\r",
+							"    pm.expect(jsonData.data['price']).to.be.eql(pm.collectionVariables.get('price'));\r",
+							"    pm.expect(jsonData.data['CPU model']).to.be.eql(pm.collectionVariables.get('cpu_model'));\r",
+							"    pm.expect(jsonData.data['Hard disk size']).to.be.eql(pm.collectionVariables.get('harddisk'));\r",
+							"    pm.expect(jsonData.data['color']).to.be.eql(pm.collectionVariables.get('color'));\r",
+							"})\r",
+							"\r",
+							"postman.setNextRequest('Delete Object');"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n   \"name\": \"{{name}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/objects/{{id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"objects",
+						"{{id}}"
+					]
+				},
+				"description": "This request tests the partial update of existing object based on {{id}} value\n\nThe below tests are validated as given at Collection level\n\nThe result should give a response code of 200.\n\nAnd the response data schema should be as per the given schema\n\nThe below tests are validated at ther request level\n\n- updatedAt property available in the responsebody\n- updated object properties and its values against the request body\n- non updated object properties should remain the same"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Object",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);\r",
+							"\r",
+							"//Verify the property message is available in the response body\r",
+							"\r",
+							"pm.test(\"Verify the property message\",function(){\r",
+							"    pm.expect(jsonData.message).to.be.eql(\"Object with id = \"+pm.collectionVariables.get('id')+\" has been deleted.\");\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/objects/{{id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"objects",
+						"{{id}}"
+					]
+				},
+				"description": "This request tests the deletion of existing object\n\nThe below tests are validated as given at Collection level\n\nThe result should give a response code of 200.\n\nAnd the response data schema should be as per the given schema\n\nThe below tests are validated at ther request level\n\n- message of the response body should contain 'Object with id = {{ID}} has been deleted. Should be displayed'"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"//Verify the response code on response to be 200",
+					"",
+					"pm.test(\"Status code is 200\", function () {",
+					"    pm.response.to.have.status(200);",
+					"});",
+					"",
+					"//Verify the schema of the response data",
+					"var expschema = {",
+					"\"Properties\":",
+					"{",
+					"\"id\": {\"type\": \"string\"},",
+					"\"name\" : {\"type\": \"string\"},",
+					"\"data\" :{\"type\": \"object\"}",
+					"}",
+					"}",
+					"",
+					"pm.test(\"Check schema\",function(){",
+					"    pm.response.to.have.jsonSchema(expschema);",
+					"})"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://api.restful-api.dev",
+			"type": "string"
+		},
+		{
+			"key": "name",
+			"value": "{{$randomProductName}}"
+		},
+		{
+			"key": "year",
+			"value": "2023"
+		},
+		{
+			"key": "price",
+			"value": "866.98"
+		},
+		{
+			"key": "cpu_model",
+			"value": "Intel Core i1"
+		},
+		{
+			"key": "harddisk",
+			"value": "3 TB"
+		},
+		{
+			"key": "id",
+			"value": ""
+		},
+		{
+			"key": "color",
+			"value": "teal"
+		}
+	]
+}
