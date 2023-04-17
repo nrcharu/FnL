@@ -6,6 +6,7 @@ Testcases list-
 Testcase steps are elaborated in 'RestfulAPI_TestCases.xlsx'
 
 Postman Script-
+
 The collection contains folowing requests and its test level validations
 1. GET request to retrieve all objects
 2. GET request to retrieve specific ids (1,5,10)
@@ -27,8 +28,8 @@ The collection contains folowing requests and its test level validations
 The ID created at scenario #3 is passed on to the subsequent requests.
 
 The following validations are given at Collection level
--Validate the response status code to be 200
-- Validate the schema of the response data
+	- Validate the response status code to be 200
+	- Validate the schema of the response data
 
 The {{base_url}} is declared as Collection level variable.
 
