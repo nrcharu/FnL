@@ -2,6 +2,10 @@ This resource contains Postman API automation of the below endpoint
 
 https://api.restful-api.dev/objects?
 
+Testcases list-
+Testcase steps are elaborated in 'RestfulAPI_TestCases.xlsx'
+
+Postman Script-
 The collection contains folowing requests and its test level validations
 1. GET request to retrieve all objects
 2. GET request to retrieve specific ids (1,5,10)
@@ -28,4 +32,3 @@ The following validations are given at Collection level
 
 The {{base_url}} is declared as Collection level variable.
 
-Testcase steps are elaborated in 'RestfulAPI_TestCases.xlsx'
